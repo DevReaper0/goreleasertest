@@ -39,6 +39,8 @@ jobs:
             git push origin --delete "$NIGHTLY_TAG"
             git tag -d "$NIGHTLY_TAG"
 
+            sleep 5s
+
             # Use GitHub REST API to find releases matching the nightly tag
             RELEASE_A=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github+json" \
@@ -49,15 +51,18 @@ jobs:
             echo $RELEASE_A | jq -r ".[]"
             echo ""
             echo ""
-            RELEASE_ID=$(echo $RELEASE_A | jq -r ".[] | select(.tag_name == \"$NIGHTLY_TAG\" and .draft == true) | .id")
+            RELEASE_IDS=$(echo $RELEASE_A | jq -r ".[] | select(.tag_name == \"$NIGHTLY_TAG\" and .draft == true) | .id")
 
-            if [ -n "$RELEASE_ID" ]; then
-              echo "Deleting draft release associated with tag: $NIGHTLY_TAG (Release ID: $RELEASE_ID)"
-              curl -X DELETE -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Accept: application/vnd.github+json" \
-                "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+            if [ -n "$RELEASE_IDS" ]; then
+              echo "Found draft releases associated with tag: $NIGHTLY_TAG"
+              echo "$RELEASE_IDS" | while read -r RELEASE_ID; do
+                echo "Deleting draft release with ID: $RELEASE_ID"
+                curl -X DELETE -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github+json" \
+                  "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+              done
             else
-              echo "No draft release found for tag: $NIGHTLY_TAG"
+              echo "No draft releases found for tag: $NIGHTLY_TAG"
             fi
           else
             echo "No existing nightly tag found."
@@ -120,4 +125,3 @@ jobs:
         env:
           SDK_PATH: ${{ steps.macos_sdk.outputs.path }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
