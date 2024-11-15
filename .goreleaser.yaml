@@ -26,7 +26,7 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - X main.version={{ if isEnvSet "IS_NIGHTLY_BUILD" }}{{ incpatch .PreviousTag }}-dev{{ else }}{{ .Version }}{{ end }}
+      - -X main.version={{ if isEnvSet "IS_NIGHTLY_BUILD" }}{{ .RawVersion }}-dev{{ else }}{{ .Version }}{{ end }}
     flags:
       - -trimpath
       - -buildmode=pie
@@ -45,7 +45,7 @@ builds:
       - "7"
     ldflags:
       - -s -w
-      - X main.version={{ if isEnvSet "IS_NIGHTLY_BUILD" }}{{ incpatch .PreviousTag }}-dev{{ else }}{{ .Version }}{{ end }}
+      - X main.version={{ if isEnvSet "IS_NIGHTLY_BUILD" }}{{ .RawVersion }}-dev{{ else }}{{ .Version }}{{ end }}
     flags:
       - -trimpath
 
@@ -59,7 +59,7 @@ builds:
       - "386"
     ldflags:
       - -s -w
-      - X main.version={{ if isEnvSet "IS_NIGHTLY_BUILD" }}{{ incpatch .PreviousTag }}-dev{{ else }}{{ .Version }}{{ end }}
+      - X main.version={{ if isEnvSet "IS_NIGHTLY_BUILD" }}{{ .RawVersion }}-dev{{ else }}{{ .Version }}{{ end }}
     flags:
       - -trimpath
 
