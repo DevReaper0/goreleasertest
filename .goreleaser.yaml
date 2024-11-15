@@ -89,4 +89,4 @@ release:
   github:
     owner: DevReaper0
     name: goreleasertest
-  prerelease: "{{ if isEnvSet \"IS_NIGHTLY_BUILD\" }}true{{ else }}auto{{ end }}"
+  prerelease: auto
