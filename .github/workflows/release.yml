@@ -39,7 +39,7 @@ jobs:
             git push origin --delete "$NIGHTLY_TAG"
             git tag -d "$NIGHTLY_TAG"
 
-            sleep 5s
+            sleep 5
 
             # Use GitHub REST API to find releases matching the nightly tag
             RELEASE_A=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
