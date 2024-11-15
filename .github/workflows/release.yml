@@ -42,14 +42,14 @@ jobs:
             # Use GitHub REST API to find releases matching the nightly tag
             RELEASE_A=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
               -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${{ github.repository }}/releases" 
+              "https://api.github.com/repos/${{ github.repository }}/releases")
             echo $RELEASE_A | jq -r
             echo ""
             echo ""
             echo $RELEASE_A | jq -r ".[]"
             echo ""
             echo ""
-            RELEASE_ID=echo $RELEASE_A | jq -r ".[] | select(.tag_name == \"$NIGHTLY_TAG\" and .draft == true) | .id")
+            RELEASE_ID=$(echo $RELEASE_A | jq -r ".[] | select(.tag_name == \"$NIGHTLY_TAG\" and .draft == true) | .id")
 
             if [ -n "$RELEASE_ID" ]; then
               echo "Deleting draft release associated with tag: $NIGHTLY_TAG (Release ID: $RELEASE_ID)"
