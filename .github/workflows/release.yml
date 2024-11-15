@@ -42,16 +42,10 @@ jobs:
             sleep 5
 
             # Use GitHub REST API to find releases matching the nightly tag
-            RELEASE_A=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            RELEASE_IDS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/${{ github.repository }}/releases")
-            echo $RELEASE_A | jq -r
-            echo ""
-            echo ""
-            echo $RELEASE_A | jq -r ".[]"
-            echo ""
-            echo ""
-            RELEASE_IDS=$(echo $RELEASE_A | jq -r ".[] | select(.tag_name == \"$NIGHTLY_TAG\" and .draft == true) | .id")
+              "https://api.github.com/repos/${{ github.repository }}/releases" \
+              | jq -r ".[] | select(.tag_name == \"$NIGHTLY_TAG\" and .draft == true) | .id")
 
             if [ -n "$RELEASE_IDS" ]; then
               echo "Found draft releases associated with tag: $NIGHTLY_TAG"
@@ -64,6 +58,7 @@ jobs:
             else
               echo "No draft releases found for tag: $NIGHTLY_TAG"
             fi
+            echo ""
           else
             echo "No existing nightly tag found."
           fi
@@ -125,4 +120,3 @@ jobs:
         env:
           SDK_PATH: ${{ steps.macos_sdk.outputs.path }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
