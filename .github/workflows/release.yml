@@ -34,6 +34,17 @@ jobs:
           echo "GORELEASER_CURRENT_TAG=nightly" >> $GITHUB_ENV
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
 
+      - name: Create nightly tag if it doesn't exist
+        run: |
+          if ! git ls-remote --tags origin | grep -q "refs/tags/nightly"; then
+            echo "nightly tag does not exist. Creating it..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git tag nightly
+            git push origin nightly
+          fi
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
