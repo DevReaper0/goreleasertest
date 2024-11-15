@@ -28,26 +28,65 @@ jobs:
         id: macos_sdk
         run: echo "path=$(xcrun --show-sdk-path)" >> $GITHUB_OUTPUT
 
-      - name: Set nightly environment variables
+      - name: Prepare for nightly release
         run: |
-          echo "IS_NIGHTLY_BUILD=1" >> $GITHUB_ENV
-          echo "GORELEASER_CURRENT_TAG=nightly" >> $GITHUB_ENV
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-
-      - name: Delete and recreate nightly tag
-        run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/nightly"; then
-            echo "nightly tag exists. Deleting it..."
-            git push origin --delete nightly
-            git tag -d nightly
+          # Delete any existing "-nightly" tag on the remote and locally
+          NIGHTLY_TAG=$(git ls-remote --tags origin | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+-nightly' | sort -V | tail -n 1)
+          if [ -n "$NIGHTLY_TAG" ]; then
+            echo "Found existing nightly tag: $NIGHTLY_TAG. Deleting it..."
+            git push origin --delete "$NIGHTLY_TAG"
+            git tag -d "$NIGHTLY_TAG"
           else
-            echo "nightly tag does not exist. Creating it..."
+            echo "No existing nightly tag found."
           fi
+
+          # Find the latest version tag
+          LATEST_TAG=$(git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z]+[0-9]*)?$' | sort -V | tail -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v0.1.0-dev"
+          fi
+          echo "Latest version tag is $LATEST_TAG"
+
+          # Remove any suffix if it exists (like "-beta1" or "-rc2")
+          BASE_TAG=$(echo "$LATEST_TAG" | sed 's/-[a-zA-Z0-9]*$//')
+          echo "Base version tag after removing suffix is $BASE_TAG"
+
+          # If the tag had a suffix, use the base tag without incrementing the patch
+          # Otherwise, increment the patch version
+          if [ "$BASE_TAG" != "$LATEST_TAG" ]; then
+            NEW_TAG="${BASE_TAG}-nightly"
+          else
+            IFS='.' read -r major minor patch <<< "${BASE_TAG#v}"
+            NEW_TAG="v$major.$minor.$((patch + 1))-nightly"
+          fi
+          echo "New nightly tag will be $NEW_TAG"
+
+          # Create and push the new nightly tag
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag nightly
-          git push origin nightly
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
+
+          echo "IS_NIGHTLY_BUILD=1" >> $GITHUB_ENV
+          #echo "NIGHTLY_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo "GORELEASER_CURRENT_TAG=$NEW_TAG" >> $GITHUB_ENV
+        if: ${{ github.ref_type != 'tag' || endsWith(github.ref, '-nightly') }}
+
+      - name: Prepare for nightly release
+        run: |
+          # Find the latest nightly tag
+          NIGHTLY_TAG=$(git ls-remote --tags origin | grep -Eo 'v[0-9]+\.[0-9]+\.[0-9]+-nightly' | sort -V | tail -n 1)
+
+          # If no nightly tag is found, throw an error
+          if [ -z "$NIGHTLY_TAG" ]; then
+            echo "::error ::No nightly tag found"
+            exit 1
+          fi
+          echo "Found nightly tag: $NIGHTLY_TAG"
+
+          # Save the NIGHTLY_TAG to the environment
+          echo "NIGHTLY_TAG=$NIGHTLY_TAG" >> $GITHUB_ENV
+        if: ${{ github.ref_type != 'tag' || endsWith(github.ref, '-nightly') }}
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
