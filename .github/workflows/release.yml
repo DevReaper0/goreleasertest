@@ -18,8 +18,27 @@ jobs:
       - name: Prepare sysroot
         id: macos_sdk
         run: |
-          cp -r $(xcrun --show-sdk-path) /tmp/macOS-sdk
-          echo "sdk_path=/tmp/macOS-sdk" >> $GITHUB_OUTPUT
+          echo $(xcrun --show-sdk-path)
+          mkdir -p sysroot
+          
+          # Exclude specific directories
+          exclude_list=(
+            "/bin" "/boot" "/dev" "/etc" "/home" "/lib/modules" "/proc" "/root" "/run" "/sys"
+            "/tmp" "/usr/bin" "/usr/share" "/var" "/snap" "*python*"
+          )
+
+          # Include specific files/extensions
+          include_patterns=(
+            "*.a" "*.so" "*.so.*" "*.h" "*.hpp" "*.pc"
+          )
+
+          # Copy root filesystem to sysroot, applying exclude rules
+          find / -type d \( $(printf -- '-path %s -o ' "${exclude_list[@]}") -false \) -prune -o -type f \( $(printf -- '-name %s -o ' "${include_patterns[@]}") -false \) -print0 | xargs -0 -I{} cp --parents {} sysroot || true
+          
+          # Show the sysroot structure
+          echo "Sysroot contents:"
+          ls -R sysroot
+          echo "sdk_path=$(pwd)/sysroot" >> $GITHUB_OUTPUT
 
       - name: Cache sysroot
         uses: actions/cache/save@v4
@@ -42,6 +61,16 @@ jobs:
         with:
           path: ${{ needs.sysroot.outputs.sdk_path }}
           key: macOS-sdk
+
+      - name: Verify sysroot content
+        run: |
+          ls -R sysroot
+          if [ "$(ls -A sysroot)" ]; then
+            echo "Sysroot restored successfully."
+          else
+            echo "Sysroot restoration failed!"
+            exit 1
+          fi
 
       - name: Set up Go
         uses: actions/setup-go@v5
