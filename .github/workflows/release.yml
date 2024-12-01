@@ -19,7 +19,7 @@ jobs:
         id: macos_sdk
         run: |
           mkdir -p sysroot
-          
+
           # Exclude specific directories
           exclude_list=(
             "/bin" "/boot" "/dev" "/etc" "/home" "/lib/modules" "/proc" "/root" "/run" "/sys"
@@ -32,15 +32,26 @@ jobs:
           )
 
           # Prepare exclusion arguments for find
-          exclude_args=$(printf "! -path '%s' " "${exclude_list[@]}")
-          include_args=$(printf "( -name '%s' -o " "${include_patterns[@]}" | sed 's/ -o $//')
+          for exclude in "${exclude_list[@]}"; do
+            exclude_args+=("-path \"$exclude\" -o ")
+          done
+          exclude_args=$(printf "%s" "${exclude_args[@]}" | sed 's/ -o $//')
+
+          # Prepare inclusion arguments for find
+          for include in "${include_patterns[@]}"; do
+            include_args+=("-name \"$include\" -o ")
+          done
+          include_args=$(printf "%s" "${include_args[@]}" | sed 's/ -o $//')
 
           # Use find and tar to copy matching files into sysroot while preserving structure
-          eval "find / \( $exclude_args -false \) -prune -o \( $include_args \) -print" | tar -cf - --files-from=- | tar -xf - -C sysroot
+          find_command="find / ( $exclude_args ) -prune -o ( $include_args ) -print"
+          echo "Running command: $find_command"
+          find / \( $exclude_args \) -prune -o \( $include_args \) -print | tar -cf - --files-from=- | tar -xf - -C sysroot
 
           # Show the sysroot structure
           echo "Sysroot contents:"
           ls -R sysroot
+
           echo "sdk_path=$(pwd)/sysroot" >> $GITHUB_OUTPUT
 
       - name: Cache sysroot
