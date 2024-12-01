@@ -15,9 +15,11 @@ jobs:
   sysroot:
     runs-on: macos-latest
     steps:
-      - name: Set output
+      - name: Prepare sysroot
         id: macos_sdk
-        run: echo "sdk_path=$(xcrun --show-sdk-path)" >> $GITHUB_OUTPUT
+        run: |
+          cp -r $(xcrun --show-sdk-path) /tmp/macOS-sdk
+          echo "sdk_path=/tmp/macOS-sdk" >> $GITHUB_OUTPUT
 
       - name: Cache sysroot
         uses: actions/cache/save@v4
