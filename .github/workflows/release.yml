@@ -18,7 +18,7 @@ jobs:
       - name: Prepare sysroot
         id: macos_sdk
         run: |
-          mkdir -p sysroot
+          mkdir -p /tmp/sysroot
 
           # Exclude specific directories
           exclude_list=(
@@ -46,13 +46,13 @@ jobs:
           # Use find and tar to copy matching files into sysroot while preserving structure
           find_command="find / ( $exclude_args ) -prune -o ( $include_args ) -print"
           echo "Running command: $find_command"
-          find / \( $exclude_args \) -prune -o \( $include_args \) -print | tar -cf - --files-from=- | tar -xf - -C sysroot
+          find / \( $exclude_args \) -prune -o \( $include_args \) -print | tar -cf - --files-from=- | tar -xf - -C /tmp/sysroot
 
           # Show the sysroot structure
           echo "Sysroot contents:"
-          ls -R sysroot
+          ls -R /tmp/sysroot
 
-          echo "sdk_path=$(pwd)/sysroot" >> $GITHUB_OUTPUT
+          echo "sdk_path=/tmp/sysroot" >> $GITHUB_OUTPUT
 
       - name: Cache sysroot
         uses: actions/cache/save@v4
@@ -78,13 +78,15 @@ jobs:
 
       - name: Verify sysroot content
         run: |
-          ls -R sysroot
-          if [ "$(ls -A sysroot)" ]; then
+          ls -R $SDK_PATH
+          if [ "$(ls -A $SDK_PATH)" ]; then
             echo "Sysroot restored successfully."
           else
             echo "Sysroot restoration failed!"
             exit 1
           fi
+        env:
+          SDK_PATH: ${{ needs.sysroot.outputs.sdk_path }}
 
       - name: Set up Go
         uses: actions/setup-go@v5
