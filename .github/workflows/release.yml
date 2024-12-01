@@ -12,81 +12,13 @@ permissions:
   contents: write
 
 jobs:
-  sysroot:
-    runs-on: macos-latest
-    steps:
-      - name: Prepare sysroot
-        id: macos_sdk
-        run: |
-          mkdir -p /tmp/sysroot
-
-          # Exclude specific directories
-          exclude_list=(
-            "/bin" "/boot" "/dev" "/etc" "/home" "/lib/modules" "/proc" "/root" "/run" "/sys"
-            "/tmp" "/usr/bin" "/usr/share" "/var" "/snap" "*python*"
-          )
-
-          # Include specific files/extensions
-          include_patterns=(
-            "*.a" "*.so" "*.so.*" "*.h" "*.hpp" "*.pc"
-          )
-
-          # Prepare exclusion arguments for find
-          for exclude in "${exclude_list[@]}"; do
-            exclude_args+=("-path \"$exclude\" -o ")
-          done
-          exclude_args=$(printf "%s" "${exclude_args[@]}" | sed 's/ -o $//')
-
-          # Prepare inclusion arguments for find
-          for include in "${include_patterns[@]}"; do
-            include_args+=("-name \"$include\" -o ")
-          done
-          include_args=$(printf "%s" "${include_args[@]}" | sed 's/ -o $//')
-
-          # Use find and tar to copy matching files into sysroot while preserving structure
-          find_command="find / ( $exclude_args ) -prune -o ( $include_args ) -print"
-          echo "Running command: $find_command"
-          find / \( $exclude_args \) -prune -o \( $include_args \) -print | tar -cf - --files-from=- | tar -xf - -C /tmp/sysroot
-
-          # Show the sysroot structure
-          echo "Sysroot contents:"
-          ls -R /tmp/sysroot
-
-          echo "sdk_path=/tmp/sysroot" >> $GITHUB_OUTPUT
-
-      - name: Cache sysroot
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ steps.macos_sdk.outputs.sdk_path }}
-          key: macOS-sdk
-    outputs:
-      sdk_path: ${{ steps.macos_sdk.outputs.sdk_path }}
-  release:
-    needs: sysroot
-    runs-on: ubuntu-latest
+  goreleaser:
+    runs-on: macos-13
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Restore sysroot
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ needs.sysroot.outputs.sdk_path }}
-          key: macOS-sdk
-
-      - name: Verify sysroot content
-        run: |
-          ls -R $SDK_PATH
-          if [ "$(ls -A $SDK_PATH)" ]; then
-            echo "Sysroot restored successfully."
-          else
-            echo "Sysroot restoration failed!"
-            exit 1
-          fi
-        env:
-          SDK_PATH: ${{ needs.sysroot.outputs.sdk_path }}
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -94,11 +26,21 @@ jobs:
           go-version: "1.22.x"
           cache: true
 
+      - name: Setup Docker on macOS
+        if: runner.os == 'macos'
+        run: |
+          brew install docker colima
+          colima start
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Set output
+        id: macos_sdk
+        run: echo "path=$(xcrun --show-sdk-path)" >> $GITHUB_OUTPUT
 
       - name: Prepare for nightly release
         run: |
@@ -186,7 +128,12 @@ jobs:
         with:
           distribution: goreleaser
           version: ~> v2
-          args: release --clean
+          args: release --clean --verbose
         env:
-          SDK_PATH: ${{ needs.sysroot.outputs.sdk_path }}
+          SDK_PATH: ${{ steps.macos_sdk.outputs.path }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up
+        run: colima stop
+
+
