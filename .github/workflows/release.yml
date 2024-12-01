@@ -42,6 +42,13 @@ jobs:
         id: macos_sdk
         run: echo "path=$(xcrun --show-sdk-path)" >> $GITHUB_OUTPUT
 
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Prepare for nightly release
         run: |
           # Delete any existing "-nightly" tag on the remote and locally
