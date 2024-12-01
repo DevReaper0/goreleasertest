@@ -63,121 +63,121 @@ builds:
     flags:
       - -trimpath
 
-dockers:
-  - image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-amd64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-amd64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-amd64"
-      - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-amd64'
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
-      - "--label=org.opencontainers.image.url={{ .GitURL }}"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.version={{ .Tag }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-    goos: linux
-    goarch: amd64
-  - image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-arm64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-arm64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-arm64"
-      - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-arm64'
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
-      - "--label=org.opencontainers.image.url={{ .GitURL }}"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.version={{ .Tag }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-    goos: linux
-    goarch: arm64
-  - image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv6"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv6"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv6"
-      - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-armv6'
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm/v6"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
-      - "--label=org.opencontainers.image.url={{ .GitURL }}"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.version={{ .Tag }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-    goos: linux
-    goarch: arm
-    goarm: 6
-  - image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv7"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv7"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv7"
-      - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-armv7'
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm/v7"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
-      - "--label=org.opencontainers.image.url={{ .GitURL }}"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-      - "--label=org.opencontainers.image.version={{ .Tag }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-    goos: linux
-    goarch: arm
-    goarm: 7
-
-docker_manifests:
-  - name_template: "ghcr.io/libramusic/libracore:v{{ .Version }}"
-    image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-amd64"
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-arm64"
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv6"
-      - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv7"
-  - name_template: "ghcr.io/libramusic/libracore:v{{ .Major }}"
-    image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-amd64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-arm64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv6"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv7"
-  - name_template: "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-amd64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-arm64"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv6"
-      - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv7"
-  - name_template: '{{ if not isEnvSet "IS_NIGHTLY_BUILD" }}ghcr.io/libramusic/libracore:latest{{ end }}'
-    image_templates:
-      - "ghcr.io/libramusic/libracore:latest-amd64"
-      - "ghcr.io/libramusic/libracore:latest-arm64"
-      - "ghcr.io/libramusic/libracore:latest-armv6"
-      - "ghcr.io/libramusic/libracore:latest-armv7"
-  - name_template: '{{ if isEnvSet "IS_NIGHTLY_BUILD" }}ghcr.io/libramusic/libracore:nightly{{ end }}'
-    image_templates:
-      - "ghcr.io/libramusic/libracore:nightly-amd64"
-      - "ghcr.io/libramusic/libracore:nightly-arm64"
-      - "ghcr.io/libramusic/libracore:nightly-armv6"
-      - "ghcr.io/libramusic/libracore:nightly-armv7"
+# dockers:
+#   - image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-amd64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-amd64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-amd64"
+#       - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-amd64'
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--platform=linux/amd64"
+#       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#       - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
+#       - "--label=org.opencontainers.image.url={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.source={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.licenses=MIT"
+#       - "--label=org.opencontainers.image.version={{ .Tag }}"
+#       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#       - "--label=org.opencontainers.image.created={{ .Date }}"
+#     goos: linux
+#     goarch: amd64
+#   - image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-arm64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-arm64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-arm64"
+#       - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-arm64'
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--platform=linux/arm64"
+#       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#       - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
+#       - "--label=org.opencontainers.image.url={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.source={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.licenses=MIT"
+#       - "--label=org.opencontainers.image.version={{ .Tag }}"
+#       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#       - "--label=org.opencontainers.image.created={{ .Date }}"
+#     goos: linux
+#     goarch: arm64
+#   - image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv6"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv6"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv6"
+#       - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-armv6'
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--platform=linux/arm/v6"
+#       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#       - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
+#       - "--label=org.opencontainers.image.url={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.source={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.licenses=MIT"
+#       - "--label=org.opencontainers.image.version={{ .Tag }}"
+#       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#       - "--label=org.opencontainers.image.created={{ .Date }}"
+#     goos: linux
+#     goarch: arm
+#     goarm: 6
+#   - image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv7"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv7"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv7"
+#       - 'ghcr.io/libramusic/libracore:{{ if isEnvSet "IS_NIGHTLY_BUILD" }}nightly{{ else }}latest{{ end }}-armv7'
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--platform=linux/arm/v7"
+#       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+#       - "--label=org.opencontainers.image.description=A new, open, and extensible music service"
+#       - "--label=org.opencontainers.image.url={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.source={{ .GitURL }}"
+#       - "--label=org.opencontainers.image.licenses=MIT"
+#       - "--label=org.opencontainers.image.version={{ .Tag }}"
+#       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+#       - "--label=org.opencontainers.image.created={{ .Date }}"
+#     goos: linux
+#     goarch: arm
+#     goarm: 7
+#
+# docker_manifests:
+#   - name_template: "ghcr.io/libramusic/libracore:v{{ .Version }}"
+#     image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-amd64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-arm64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv6"
+#       - "ghcr.io/libramusic/libracore:v{{ .Version }}-armv7"
+#   - name_template: "ghcr.io/libramusic/libracore:v{{ .Major }}"
+#     image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-amd64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-arm64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv6"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}-armv7"
+#   - name_template: "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}"
+#     image_templates:
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-amd64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-arm64"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv6"
+#       - "ghcr.io/libramusic/libracore:v{{ .Major }}.{{ .Minor }}-armv7"
+#   - name_template: '{{ if not isEnvSet "IS_NIGHTLY_BUILD" }}ghcr.io/libramusic/libracore:latest{{ end }}'
+#     image_templates:
+#       - "ghcr.io/libramusic/libracore:latest-amd64"
+#       - "ghcr.io/libramusic/libracore:latest-arm64"
+#       - "ghcr.io/libramusic/libracore:latest-armv6"
+#       - "ghcr.io/libramusic/libracore:latest-armv7"
+#   - name_template: '{{ if isEnvSet "IS_NIGHTLY_BUILD" }}ghcr.io/libramusic/libracore:nightly{{ end }}'
+#     image_templates:
+#       - "ghcr.io/libramusic/libracore:nightly-amd64"
+#       - "ghcr.io/libramusic/libracore:nightly-arm64"
+#       - "ghcr.io/libramusic/libracore:nightly-armv6"
+#       - "ghcr.io/libramusic/libracore:nightly-armv7"
 
 archives:
   - format: tar.gz
