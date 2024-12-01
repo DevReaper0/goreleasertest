@@ -39,6 +39,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           sdk_path: ${{ needs.sysroot.outputs.sdk_path }}
+          key: ${{ runner.os }}-sdk
 
       - name: Set up Go
         uses: actions/setup-go@v5
