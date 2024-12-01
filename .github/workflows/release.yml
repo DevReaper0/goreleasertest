@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ steps.macos_sdk.outputs.sdk_path }}
-          key: ${{ runner.os }}-sdk
+          key: macOS-sdk
     outputs:
       sdk_path: ${{ steps.macos_sdk.outputs.sdk_path }}
   release:
@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ needs.sysroot.outputs.sdk_path }}
-          key: ${{ runner.os }}-sdk
+          key: macOS-sdk
 
       - name: Set up Go
         uses: actions/setup-go@v5
