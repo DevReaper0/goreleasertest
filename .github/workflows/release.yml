@@ -18,7 +18,6 @@ jobs:
       - name: Prepare sysroot
         id: macos_sdk
         run: |
-          echo $(xcrun --show-sdk-path)
           mkdir -p sysroot
           
           # Exclude specific directories
@@ -32,9 +31,13 @@ jobs:
             "*.a" "*.so" "*.so.*" "*.h" "*.hpp" "*.pc"
           )
 
-          # Copy root filesystem to sysroot, applying exclude rules
-          find / -type d \( $(printf -- '-path %s -o ' "${exclude_list[@]}") -false \) -prune -o -type f \( $(printf -- '-name %s -o ' "${include_patterns[@]}") -false \) -print0 | xargs -0 -I{} cp --parents {} sysroot || true
-          
+          # Prepare exclusion arguments for find
+          exclude_args=$(printf "! -path '%s' " "${exclude_list[@]}")
+          include_args=$(printf "( -name '%s' -o " "${include_patterns[@]}" | sed 's/ -o $//')
+
+          # Use find and tar to copy matching files into sysroot while preserving structure
+          eval "find / \( $exclude_args -false \) -prune -o \( $include_args \) -print" | tar -cf - --files-from=- | tar -xf - -C sysroot
+
           # Show the sysroot structure
           echo "Sysroot contents:"
           ls -R sysroot
