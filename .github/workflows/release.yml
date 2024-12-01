@@ -38,7 +38,7 @@ jobs:
       - name: Restore sysroot
         uses: actions/cache/restore@v4
         with:
-          sdk_path: ${{ needs.sysroot.outputs.sdk_path }}
+          path: ${{ needs.sysroot.outputs.sdk_path }}
           key: ${{ runner.os }}-sdk
 
       - name: Set up Go
