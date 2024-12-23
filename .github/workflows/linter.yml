@@ -21,12 +21,11 @@ jobs:
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_GO: true
-          VALIDATE_PYTHON_FLAKE8: false
-          VALIDATE_PYTHON_RUFF: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_SHELL_SHFMT: true
-          VALIDATE_SHELL: true
+          FIX_GO_MODULES: true
+          FIX_GO: true
+          FIX_MARKDOWN: true
+          FIX_PYTHON_RUFF: true
+          FIX_SHELL_SHFMT: true
           ACTIONS_RUNNER_DEBUG: true
 
       - name: Check for autofixes
