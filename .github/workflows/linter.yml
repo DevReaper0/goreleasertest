@@ -48,13 +48,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit changes
-        run: |
-          git checkout -b lint-fixes
-          git add .
-          git commit -m "chore: fix linting issues"
-          git push origin lint-fixes
-
       - name: Create a Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
