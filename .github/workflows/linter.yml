@@ -36,18 +36,6 @@ jobs:
           args: check --fix
       - run: ruff format
 
-      - name: Check for autofixes
-        run: |
-          if git diff --exit-code; then
-            echo "No changes detected. Exiting."
-            exit 0
-          fi
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
       - name: Create a Pull Request
         uses: peter-evans/create-pull-request@v7
         with:

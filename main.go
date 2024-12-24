@@ -1,9 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 var version = "dev"
 
 func main() {
+
 	fmt.Println("Version:", version)
 }
