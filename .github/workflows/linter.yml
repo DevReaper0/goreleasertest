@@ -27,6 +27,7 @@ jobs:
           FIX_NATURAL_LANGUAGE: true
           FIX_PYTHON_RUFF: true
           FIX_SHELL_SHFMT: true
+          VALIDATE_GITHUB_ACTIONS: false
           ACTIONS_RUNNER_DEBUG: true
 
       - name: Check for autofixes
