@@ -38,7 +38,7 @@ jobs:
 
       - name: Run ShellCheck
         run: |
-          [ -n "$(find . -type f -name "*.sh")" ] && shellcheck **/*.sh
+          [ ! -n "$(find . -type f -name "*.sh")" ] || shellcheck **/**.sh
 
       # - name: Create a Pull Request
       #   uses: peter-evans/create-pull-request@v7
