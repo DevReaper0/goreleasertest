@@ -7,6 +7,5 @@ import (
 var version = "dev"
 
 func main() {
-
 	fmt.Println("Version:", version)
 }
